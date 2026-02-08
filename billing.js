@@ -83,6 +83,18 @@ window.generateBill = function (e) {
     document.getElementById('pLab').innerText = lab;
     document.getElementById('pRoom').innerText = room;
     document.getElementById('pTotal').innerText = total;
+
+    // ==========================================
+    // SAVE BILL TO STORAGE (For Dashboard Earnings)
+    // ==========================================
+    const billData = {
+        amount: parseFloat(total),
+        date: new Date().toLocaleDateString('en-GB') // e.g. "08/02/2026"
+    };
+
+    let bills = JSON.parse(localStorage.getItem('hdms_bills')) || [];
+    bills.push(billData);
+    localStorage.setItem('hdms_bills', JSON.stringify(bills));
 }
 
 // Initial Load
