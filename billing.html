@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing - MedCare Hospital</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="modal.css">
+    <!-- Ionicons -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        /* Specific Styles for Billing Page */
+        .billing-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .bill-form,
+        .bill-preview {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 7px 25px rgba(0, 0, 0, 0.08);
+        }
+
+        .bill-header {
+            text-align: center;
+            border-bottom: 2px dashed #ccc;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .bill-header h1 {
+            color: var(--blue);
+        }
+
+        .bill-total {
+            font-size: 2em;
+            color: var(--blue);
+            text-align: right;
+            margin-top: 20px;
+            border-top: 2px solid #ccc;
+            padding-top: 10px;
+        }
+
+        .print-btn {
+            background: #28a745;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .print-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="navigation">
+            <ul>
+                <li>
+                    <a href="#">
+                        <span class="icon"><ion-icon name="medkit"></ion-icon></span>
+                        <span class="title">MedCare Hospital</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="index.html">
+                        <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                        <span class="title">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
+                        <span class="title">Patients</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="pharmacy.html">
+                        <span class="icon"><ion-icon name="flask-outline"></ion-icon></span>
+                        <span class="title">Pharmacy</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="billing.html" class="active">
+                        <span class="icon"><ion-icon name="cash-outline"></ion-icon></span>
+                        <span class="title">Billing & Income</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon"><ion-icon name="log-out-outline"></ion-icon></span>
+                        <span class="title">Sign Out</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main">
+            <div class="topbar">
+                <div class="toggle">
+                    <ion-icon name="menu-outline"></ion-icon>
+                </div>
+                <div class="user">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D6EFD&color=fff" alt="">
+                </div>
+            </div>
+
+            <!-- Billing Section -->
+            <div class="billing-container">
+                <!-- Left: Input Form -->
+                <div class="bill-form">
+                    <h2>Create New Invoice</h2>
+                    <br>
+                    <form id="billingForm" onsubmit="generateBill(event)">
+                        <div class="input-group">
+                            <label>Select Patient</label>
+                            <select id="bPatient" onchange="autoFillPatient()">
+                                <option value="">-- Choose Patient --</option>
+                                <!-- JS will populate this -->
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>Doctor Name</label>
+                            <input type="text" id="bDoctor" value="Dr. Sasi Kumar" readonly>
+                        </div>
+
+                        <h3>Charges</h3>
+                        <div class="input-group two-col">
+                            <div>
+                                <label>Consultation Fee</label>
+                                <input type="number" id="bConsult" value="500" oninput="calculateTotal()">
+                            </div>
+                            <div>
+                                <label>Medicine Cost</label>
+                                <input type="number" id="bMedicine" value="0" oninput="calculateTotal()">
+                            </div>
+                        </div>
+                        <div class="input-group two-col">
+                            <div>
+                                <label>Lab / Tests Cost</label>
+                                <input type="number" id="bLab" value="0" oninput="calculateTotal()">
+                            </div>
+                            <div>
+                                <label>Room / Bed Charges</label>
+                                <input type="number" id="bRoom" value="0" oninput="calculateTotal()">
+                            </div>
+                        </div>
+
+                        <!-- Total Display -->
+                        <div class="input-group">
+                            <label>Grand Total (₹)</label>
+                            <input type="text" id="bTotal" value="500" readonly
+                                style="font-weight: bold; font-size: 1.5em; color: var(--blue);">
+                        </div>
+
+                        <button type="submit" class="save-btn">Generate Invoice</button>
+                    </form>
+                </div>
+
+                <!-- Right: Invoice Preview -->
+                <div class="bill-preview" id="invoicePreview" style="display:none;">
+                    <div class="bill-header">
+                        <h1>MEDCARE HOSPITAL</h1>
+                        <p>123, Health Street, City - 560001</p>
+                        <p>Ph: +91 9876543210</p>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>
+                            <p><strong>Patient:</strong> <span id="invPatient">Name</span></p>
+                            <p><strong>Doctor:</strong> Dr. Sasi Kumar</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p><strong>Invoice #:</strong> <span id="invNo">INV-001</span></p>
+                            <p><strong>Date:</strong> <span id="invDate">DD/MM/YYYY</span></p>
+                        </div>
+                    </div>
+                    <hr style="margin: 20px 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead style="background: #f5f5f5;">
+                            <tr>
+                                <th style="padding: 10px; text-align: left;">Description</th>
+                                <th style="padding: 10px; text-align: right;">Amount (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 10px;">Consultation Fee</td>
+                                <td style="padding: 10px; text-align: right;" id="pConsult">500</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px;">Pharmacy Charges</td>
+                                <td style="padding: 10px; text-align: right;" id="pMedicine">0</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px;">Lab / Diagnostics</td>
+                                <td style="padding: 10px; text-align: right;" id="pLab">0</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px;">Room Rent</td>
+                                <td style="padding: 10px; text-align: right;" id="pRoom">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="bill-total">
+                        Total: ₹<span id="pTotal">500</span>
+                    </div>
+
+                    <button class="print-btn" onclick="window.print()">Print Invoice</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="billing.js"></script>
+</body>
+
+</html>
